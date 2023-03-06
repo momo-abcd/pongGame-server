@@ -39,9 +39,6 @@ public class GameQueue extends Thread {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if(playerList == null){
-                    playerList = new Vector<>();
-                }
 
                 // 큐에 2명이 접속하면 게임방 하나를 만들어서 진행(게임 시작)
                 if(playerList.size() == 2) {
@@ -72,7 +69,7 @@ public class GameQueue extends Thread {
                     }
                     if(isAllConnected){
                         new GameRoom(playerList);
-                        playerList = null;
+                        playerList = new Vector<Socket>();
                     }
                 }
             }
