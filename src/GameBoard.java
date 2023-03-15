@@ -12,7 +12,6 @@ public class GameBoard {
     private Paddle player1_paddle;
     private Paddle player2_paddle;
     private Ball ball;
-    private static double speed = 10;
     public GameBoard(Vector<Socket> players){
             player1_paddle = new Paddle(0, Height/2-50);
             player2_paddle = new Paddle(Width-Paddle.Width,Height/2-50);
@@ -22,7 +21,7 @@ public class GameBoard {
             while(it.hasNext()) {
                 Socket s = it.next();
                 keyReceiver =  new KeyReceiver(s, players, player1_paddle, player2_paddle, ball);
-                keyReceiver.start();
+                // keyReceiver.start();
             }
 
     }

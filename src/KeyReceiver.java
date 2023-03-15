@@ -4,9 +4,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
-public class KeyReceiver extends Thread {
+public class KeyReceiver{
     private BufferedReader br;
     private PrintWriter pw;
     private Vector<Socket> playerList;
@@ -18,6 +20,8 @@ public class KeyReceiver extends Thread {
     private boolean p1_sPressed = false;
     private boolean p2_wPressed = false;
     private boolean p2_sPressed = false;
+
+    private Thread keyReceiver;
 
     // create constructor
     public KeyReceiver(Socket socket, Vector<Socket> playerList, Paddle player1, Paddle player2, Ball ball) {
@@ -32,40 +36,65 @@ public class KeyReceiver extends Thread {
         }catch (IOException e){
             System.err.println(e);
         }
-    }
 
-    @Override
-    public void run() {
-        /** 
-         * data 형식 :playerCode + ":"+keyCode.toLowerCase()+":"+instruction;
-         * ex : p1:w:KEY_PRESSED
-         *      p2:s:KEY_RELEASED
-         */
-        System.out.println("running");
-        try {
-            String data = "";
-            while((data = br.readLine()) != null){
-                System.out.println(data);
-                // if(data.equals("p1:w")){
-                //     send("p1:w");
-                // }
-                // else if(data.equals("p1:s")){
-                //     send("p1:s");
-                // }
-                // else if(data.equals("p2:w")){
-                //     send("p2:w");
-                // }
-                // else if(data.equals("p2:s")){
-                //     send("p1:s");
-                // }
-                // else {
-                //     send("nothing");
-                //     System.out.println(data);
-                // }
+        keyReceiver = initKeyReceiver();
+        keyReceiver.start();
+
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                    gameLogic();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        };
+        Timer timer = new Timer();
+        timer.schedule(timerTask,0, 500);
+    
+    }
+    public Thread initKeyReceiver() {
+        return new Thread() {
+            @Override
+            public void run() {
+                /** 
+                 * data 형식 :playerCode + ":"+keyCode.toLowerCase()+":"+instruction;
+                 * ex : p1:w:KEY_PRESSED
+                 *      p2:s:KEY_RELEASED
+                 */
+                System.out.println("running");
+                try {
+                    String data = "";
+                    while((data = br.readLine()) != null){
+                        System.out.println(data + "// KeyReceiver.java 55");
+                        if(data.equals("p1:w:KEY_PRESSED")){
+                            p1_wPressed = true;
+                        }
+                        else if(data.equals("p1:w:KEY_RELEASED")){
+                            p1_wPressed = false;
+                        }
+                        else if(data.equals("p1:s:KEY_PRESSED")){
+                            p1_sPressed = true;
+                        }
+                        else if(data.equals("p1:s:KEY_RELEASED")){
+                            p1_sPressed = false;
+                        }
+
+                        else if(data.equals("p2:w:KEY_PRESSED")){
+                            p2_wPressed = true;
+                        }
+                        else if(data.equals("p2:w:KEY_RELEASED")){
+                            p2_wPressed = false;
+                        }
+                        else if(data.equals("p2:s:KEY_PRESSED")){
+                            p2_sPressed = true;
+                        }
+                        else if(data.equals("p2:s:KEY_RELEASED")){
+                            p2_sPressed = false;
+                        }else{}
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
     private void send(String data){
         Iterator<Socket> it = playerList.iterator();
@@ -98,5 +127,7 @@ public class KeyReceiver extends Thread {
         }
 
         ball.update();
+        System.out.println("player1 X : " + player1.getX());
+        System.out.println("player1 Y : " + player1.getY());
     }
 }
