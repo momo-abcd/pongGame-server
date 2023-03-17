@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Iterator;
 import java.util.Vector;
@@ -8,6 +11,8 @@ public class GameBoard {
     static double speed = 10; //패들 움직임 속도
 
     private KeyReceiver keyReceiver;
+    private BufferedReader br;
+    private PrintWriter pw;
 
     private Paddle player1_paddle;
     private Paddle player2_paddle;
@@ -21,8 +26,8 @@ public class GameBoard {
             while(it.hasNext()) {
                 Socket s = it.next();
                 keyReceiver =  new KeyReceiver(s, players, player1_paddle, player2_paddle, ball);
+                Sender sender = new Sender(s, player1_paddle, player2_paddle, ball);
                 // keyReceiver.start();
             }
-
     }
 }

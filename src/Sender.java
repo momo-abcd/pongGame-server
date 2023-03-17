@@ -3,43 +3,41 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Vector;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class Sender extends Thread {
+public class Sender{
     private Socket socket;
-    BufferedReader br;
     PrintWriter pw;
+    Thread thread;
+    Timer timer;
 
-    private String[] messageQueue;
-    private Queue<String> queue = new LinkedList<>();
-    public Sender(Socket s){
-        socket = s;
+    Paddle paddle1;
+    Paddle paddle2;
+    Ball ball;
+
+    public Sender(Socket socket, Paddle paddle1, Paddle paddle2, Ball ball){
         try {
-            br = new BufferedReader(new InputStreamReader(System.in));
-            pw = new PrintWriter(socket.getOutputStream());
+            this.pw = new PrintWriter(socket.getOutputStream());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            System.err.println("error occuured");
         }
-    }
-    @Override
-    public void run() {
-        try {
-            String s;
-            while((s = br.readLine()) != null){
-                System.out.print("보낼 문자 입력: ");
-                send(s);
+        this.paddle1 = paddle1;
+        this.paddle2 = paddle2;
+        this.ball = ball;
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+            System.out.println("sent");
+            send();
             }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        }, 0, 100);
     }
 
-    public void send(String str) {
-        pw.println(str);
+    public void send() {
+        pw.println(paddle1.getY() + ":" + paddle2.getY() + ":" + ball.getX() + ":" + ball.getY());
         pw.flush();
     }
 }

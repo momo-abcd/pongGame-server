@@ -112,6 +112,7 @@ public class KeyReceiver{
 
     }
 
+    // 근데 이런식으로 하면 키가 씹히는 경우가 생길 수 있음 일단 보류;
     private void gameLogic() {
         if(p1_wPressed){
             player1.update(-GameBoard.speed);
