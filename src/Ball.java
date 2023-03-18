@@ -68,5 +68,11 @@ class Ball {
             reverseY();
         if(y + Height >= GameBoard.Height)
             reverseY();
+
+        // 공 안나가기 위해 잠시 설정해둔 것 실제 게임에선 지워야함
+        // if(x < 0 ) 
+        //     reverseX();
+        // if(x + Width >= GameBoard.Width)
+        //     reverseX();
     }
 }

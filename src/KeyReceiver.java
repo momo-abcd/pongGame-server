@@ -23,13 +23,22 @@ public class KeyReceiver{
 
     private Thread keyReceiver;
 
+    private GameBoard gameBoard;
+
     // create constructor
-    public KeyReceiver(Socket socket, Vector<Socket> playerList, Paddle player1, Paddle player2, Ball ball) {
+    public KeyReceiver(
+        Socket socket,
+         Vector<Socket> playerList,
+          Paddle player1, Paddle player2,
+          Ball ball,
+          GameBoard gameBoard
+        ) {
         this.playerList = playerList;
         this.ball = ball;
         this.player1 = player1;
         this.player2 = player2;
         this.socket = socket;
+        this.gameBoard = gameBoard;
         try{
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             // pw = new PrintWriter(socket.getOutputStream());
@@ -38,16 +47,17 @@ public class KeyReceiver{
         }
 
         keyReceiver = initKeyReceiver();
+        keyReceiver.setDaemon(true);
         keyReceiver.start();
 
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                    gameLogic();
-            }
-        };
-        Timer timer = new Timer();
-        timer.schedule(timerTask,0, 500);
+        // TimerTask timerTask = new TimerTask() {
+        //     @Override
+        //     public void run() {
+        //             gameLogic();
+        //     }
+        // };
+        // Timer timer = new Timer();
+        // timer.schedule(timerTask,0, 500);
     
     }
     public Thread initKeyReceiver() {
@@ -59,76 +69,55 @@ public class KeyReceiver{
                  * ex : p1:w:KEY_PRESSED
                  *      p2:s:KEY_RELEASED
                  */
-                System.out.println("running");
+                System.out.println("keyReceiver is started");
                 try {
                     String data = "";
                     while((data = br.readLine()) != null){
                         System.out.println(data + "// KeyReceiver.java 55");
                         if(data.equals("p1:w:KEY_PRESSED")){
-                            p1_wPressed = true;
+                            gameBoard.p1_wPressed.setValue(true);
                         }
                         else if(data.equals("p1:w:KEY_RELEASED")){
-                            p1_wPressed = false;
+                            gameBoard.p1_wPressed.setValue(false);
                         }
                         else if(data.equals("p1:s:KEY_PRESSED")){
-                            p1_sPressed = true;
+                            gameBoard.p1_sPressed.setValue(true);
                         }
                         else if(data.equals("p1:s:KEY_RELEASED")){
-                            p1_sPressed = false;
+                            gameBoard.p1_sPressed.setValue(false);
                         }
 
-                        else if(data.equals("p2:w:KEY_PRESSED")){
-                            p2_wPressed = true;
+                        else if(data.equals("p2:up:KEY_PRESSED")){
+                            gameBoard.p2_wPressed.setValue(true);
                         }
-                        else if(data.equals("p2:w:KEY_RELEASED")){
+                        else if(data.equals("p2:up:KEY_RELEASED")){
                             p2_wPressed = false;
+                            gameBoard.p2_wPressed.setValue(false);
                         }
-                        else if(data.equals("p2:s:KEY_PRESSED")){
-                            p2_sPressed = true;
+                        else if(data.equals("p2:down:KEY_PRESSED")){
+                            gameBoard.p2_sPressed.setValue(true);
                         }
-                        else if(data.equals("p2:s:KEY_RELEASED")){
-                            p2_sPressed = false;
+                        else if(data.equals("p2:down:KEY_RELEASED")){
+                            gameBoard.p2_sPressed.setValue(false);
                         }else{}
+                        System.out.println("data : "+ data);
                     }
+                    socket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    gameBoard.senderStop();
                 }
             }
         };
     }
-    private void send(String data){
-        Iterator<Socket> it = playerList.iterator();
-        while(it.hasNext()) {
-            Socket s = (Socket) it.next();
-            try {
-                pw = new PrintWriter(s.getOutputStream());
-                pw.println(data);
-                pw.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+    public boolean isClosed() {
+        try {
+            if(br.readLine() == null) return true;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
         }
-
-    }
-
-    // 근데 이런식으로 하면 키가 씹히는 경우가 생길 수 있음 일단 보류;
-    private void gameLogic() {
-        if(p1_wPressed){
-            player1.update(-GameBoard.speed);
-        }
-        if(p1_sPressed){
-            player1.update(GameBoard.speed);
-        }
-        if(p2_wPressed){
-            player2.update(-GameBoard.speed);
-        }
-        if(p2_sPressed){
-            player2.update(GameBoard.speed);
-        }
-
-        ball.update();
-        System.out.println("player1 X : " + player1.getX());
-        System.out.println("player1 Y : " + player1.getY());
+        return false;
     }
 }
