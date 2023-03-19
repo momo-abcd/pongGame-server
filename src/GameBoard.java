@@ -30,21 +30,26 @@ public class GameBoard {
     public BooleanPressed p2_wPressed = new BooleanPressed();
     public BooleanPressed p2_sPressed = new BooleanPressed();
 
+    Socket[] playersSocket = new Socket[2];
+
 
     public GameBoard(Vector<Socket> players){
             player1_paddle = new Paddle(0, Height/2-50);
             player2_paddle = new Paddle(Width-Paddle.Width,Height/2-50);
             ball = new Ball();
-            gameLogicThread();
 
             Iterator<Socket> it = players.iterator();
             int index = 0;
             while(it.hasNext()) {
-                Socket s = it.next();
-                keyReceiver[index] =  new KeyReceiver(s, players, player1_paddle, player2_paddle, ball, this);
-                sender[index++] = new Sender(s, player1_paddle, player2_paddle, ball, player1_score, player2_score);
+                playersSocket[index] = it.next();
+                keyReceiver[index] =  new KeyReceiver(playersSocket[index], players, player1_paddle, player2_paddle, ball, this);
+                index++;
+                // TMP
+                // sender[index++] = new Sender(s, player1_paddle, player2_paddle, ball, player1_score, player2_score, this);
+
                 // keyReceiver.start();
             }
+            gameLogicThread();
     }
 
     public void senderStop() {
@@ -56,12 +61,14 @@ public class GameBoard {
         //     sender[0].isClosed();
         //     sender[1].isClosed();
         // }
-            sender[0].isClosed();
-            sender[1].isClosed();
+
+            // TMP
+            // sender[0].isClosed();
+            // sender[1].isClosed();
     }
 
     private void gameLogicThread() {
-        Timer timer = new Timer();
+        Timer timer = new Timer(true);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -123,6 +130,8 @@ public class GameBoard {
         }
 
         ball.update();
+        (new Sender(playersSocket[0], player1_paddle, player2_paddle, ball, player1_score, player2_score, this)).send();
+        (new Sender(playersSocket[1], player1_paddle, player2_paddle, ball, player1_score, player2_score, this)).send();
     }
 
     class BooleanPressed{

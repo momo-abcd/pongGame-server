@@ -25,7 +25,7 @@ class Ball {
         x += xVelocity;
         y += yVelocity;
     }
-    public void update(){
+    synchronized public void update(){
         move();
     }
     public void reverseX() {
@@ -40,10 +40,10 @@ class Ball {
         xVelocity *= (new Random()).nextBoolean() ? -1 : 1;
     }
 
-    public double getX() {
+    synchronized public double getX() {
         return this.x;
     }
-    public double getY() {
+    synchronized public double getY() {
         return this.y;
     }
     public double getRadius() {

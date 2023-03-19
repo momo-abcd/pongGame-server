@@ -18,9 +18,11 @@ public class Sender{
 
     PlayerScore player1_Score;
     PlayerScore player2_Score;
+    
+    GameBoard gameBoard;
 
     public Sender(Socket socket, Paddle paddle1, Paddle paddle2, Ball ball,
-    PlayerScore player1_score, PlayerScore player2_score
+    PlayerScore player1_score, PlayerScore player2_score, GameBoard gameBoard
     ){
         try {
             this.pw = new PrintWriter(socket.getOutputStream());
@@ -34,18 +36,21 @@ public class Sender{
         this.ball = ball;
         this.player1_Score = player1_score;
         this.player2_Score = player2_score;
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-            // System.out.println("sent");
-            send();
-            }
-        }, 0, 10);
+        this.gameBoard = gameBoard;
+        // timer = new Timer(true);
+        // timer.schedule(new TimerTask() {
+        //     @Override
+        //     public void run() {
+        //     // System.out.println("sent");
+        //     send();
+        //     }
+        // }, 0, 1000);
     }
 
     public void send() {
-        System.out.println(player1_Score.getScore() + "/" + player2_Score.getScore());
+        // System.out.println(player1_Score.getScore() + "/" + player2_Score.getScore());
+        // gameBoard.gameLogic();
+        System.out.println(ball.getX() + " // " + ball.getY());
         pw.println(paddle1.getY() + ":" + paddle2.getY() + ":" + ball.getX() + ":" + ball.getY() + ":" + player1_Score.getScore() + ":" + player2_Score.getScore());
         pw.flush();
     }

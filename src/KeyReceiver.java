@@ -73,7 +73,7 @@ public class KeyReceiver{
                 try {
                     String data = "";
                     while((data = br.readLine()) != null){
-                        System.out.println(data + "// KeyReceiver.java 55");
+                        // System.out.println(data + "// KeyReceiver.java 55");
                         if(data.equals("p1:w:KEY_PRESSED")){
                             gameBoard.p1_wPressed.setValue(true);
                         }
@@ -100,7 +100,7 @@ public class KeyReceiver{
                         else if(data.equals("p2:down:KEY_RELEASED")){
                             gameBoard.p2_sPressed.setValue(false);
                         }else{}
-                        System.out.println("data : "+ data);
+                        // System.out.println("data : "+ data);
                     }
                     socket.close();
                 } catch (IOException e) {
